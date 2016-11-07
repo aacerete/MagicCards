@@ -6,4 +6,9 @@
             android:orderInCategory="100"
             android:title="Refresh"
             app:showAsAction="never" />
+        <item
+            android:title="Settings"
+            android:orderInCategory="101"
+            android:id="@+id/action_settings"
+            android:showAsAction="never" />
     </menu>

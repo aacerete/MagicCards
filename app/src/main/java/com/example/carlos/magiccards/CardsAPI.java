@@ -17,12 +17,39 @@ public class CardsAPI {
     private final String BASE_URL = "http://api.magicthegathering.io/v1/cards";
 
     ArrayList<Card> getAllCards() {
-        Uri builtUri = Uri.parse(BASE_URL)
-                .buildUpon()
-                .build();
+        Uri builtUri = Uri.parse(BASE_URL).buildUpon().build();
         String url = builtUri.toString();
         return doCall(url);
     }
+
+    //Obtenir les cartes per raresa o per color
+    ArrayList<Card> getCardsByRarityAndOrColor (String color , String rarity) {
+
+        Uri builtUri;
+
+        if (!color.equalsIgnoreCase("None") && !rarity.equalsIgnoreCase("None")) {
+            builtUri = Uri.parse(BASE_URL)
+                    .buildUpon()
+                    .appendQueryParameter("colors" , color)
+                    .appendQueryParameter("rarity" , rarity)
+                    .build();
+        } else if (!color.equalsIgnoreCase("None")) {
+            builtUri = Uri.parse(BASE_URL)
+                    .buildUpon()
+                    .appendQueryParameter("colors" , color)
+                    .build();
+        } else {
+            builtUri = Uri.parse(BASE_URL)
+                    .buildUpon()
+                    .appendQueryParameter("rarity" , rarity)
+                    .build();
+        }
+
+        String url = builtUri.toString();
+        return doCall(url);
+    }
+
+
 
     private ArrayList<Card> doCall(String url) {
 
@@ -56,6 +83,15 @@ public class CardsAPI {
                     card.setRarity(object.getString("rarity"));
                 } else {
                     card.setRarity("");
+                }
+                if (object.has("colors")) {
+                    String[] colors = new String[object.getJSONArray("colors").length()];
+
+                    for (int j = 0 ; j < colors.length ; j++) {
+                        colors[j] = object.getJSONArray("colors").get(j).toString();
+                    }
+
+                    card.setColor(colors);
                 }
                 if (object.has("text")) {
                     card.setText(object.getString("text"));

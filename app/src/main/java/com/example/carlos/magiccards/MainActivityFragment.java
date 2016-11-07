@@ -1,7 +1,11 @@
 package com.example.carlos.magiccards;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,14 +20,15 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment {
 
-    private ArrayList<String> items;
-    private ArrayAdapter<String> adapter;
+    private CardAdapter adapter;
+    private ArrayList<Card> cards;
 
     public MainActivityFragment() {
     }
@@ -49,6 +54,9 @@ public class MainActivityFragment extends Fragment {
         if (id == R.id.action_refresh) {
             refresh();
             return true;
+        } else if (id == R.id.action_settings) {
+            startActivity(new Intent(getContext() , SettingsActivity.class));
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -59,26 +67,23 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        refresh();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         ListView listView = (ListView) view.findViewById(R.id.lvCard);
 
-        String[] data = {
-                "Buba 500",
-                "El hola",
-                "El adios",
-                "Hola que tal, soy colosal!",
-                "Infiltradisimos en 56"
-        };
-
-        items = new ArrayList<>(Arrays.asList(data));
-        adapter = new ArrayAdapter<>(
+        cards = new ArrayList<>();
+        adapter = new CardAdapter(
                 getContext(),
                 R.layout.lv_cards_row,
-                R.id.tvCard,
-                items
+                cards
         );
 
         listView.setAdapter(adapter);
@@ -90,9 +95,22 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected ArrayList<Card> doInBackground(Void... voids) {
             CardsAPI api = new CardsAPI();
-            ArrayList<Card> result = api.getAllCards();
+            ArrayList<Card> result;
 
-            Log.d("DEBUG", result.toString());
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            String color = preferences.getString("color" , "None");
+            String rarity = preferences.getString("rarity" , "None");
+
+            //Depenent del color i raresa, fem una crida o un altra amb la API
+            if (color.equalsIgnoreCase("None") && rarity.equalsIgnoreCase("None")) {
+                result = api.getAllCards();
+            } else if (!color.equalsIgnoreCase("None") && !rarity.equalsIgnoreCase("None")) {
+                result = api.getCardsByRarityAndOrColor(color , rarity);
+            } else if (!color.equalsIgnoreCase("None")) {
+                result = api.getCardsByRarityAndOrColor(color , "None");
+            } else {
+                result = api.getCardsByRarityAndOrColor("None" , rarity);
+            }
 
             return result;
         }
@@ -100,8 +118,12 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected void onPostExecute(ArrayList<Card> cards) {
             adapter.clear();
-            for (Card c : cards) {
-                adapter.add(c.getName());
+            if (!cards.isEmpty()) {
+                for (Card c : cards) {
+                    adapter.add(c);
+                }
+            } else {
+                Snackbar.make(getView() , "No hi ha cartes" , Snackbar.LENGTH_LONG).show();
             }
         }
     }
