@@ -1,10 +1,8 @@
 package com.example.carlos.magiccards;
 
-/**
- * Created by Carlos on 18/10/2016.
- */
+import java.io.Serializable;
 
-public class Card {
+public class Card implements Serializable{
 
     private String id;
     private String name;
