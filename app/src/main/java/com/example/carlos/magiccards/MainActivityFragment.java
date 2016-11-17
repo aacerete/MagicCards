@@ -2,33 +2,33 @@ package com.example.carlos.magiccards;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.database.Cursor;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.AdapterView;
+
+import com.example.carlos.magiccards.databinding.FragmentMainBinding;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
 
-/**
- * A placeholder fragment containing a simple view.
- */
-public class MainActivityFragment extends Fragment {
 
-    private CardAdapter adapter;
-    private ArrayList<Card> cards;
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private CardsCursorAdapter adapter;
 
     public MainActivityFragment() {
     }
@@ -75,26 +75,49 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ListView listView = (ListView) view.findViewById(R.id.lvCard);
+        FragmentMainBinding binding = DataBindingUtil.inflate(inflater , R.layout.fragment_main , container , false);
+        View view = binding.getRoot();
 
-        cards = new ArrayList<>();
-        adapter = new CardAdapter(
-                getContext(),
-                R.layout.lv_cards_row,
-                cards
-        );
+        adapter = new CardsCursorAdapter(getContext() , Card.class);
 
-        listView.setAdapter(adapter);
+        binding.lvCard.setAdapter(adapter);
+        binding.lvCard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Card card = (Card) parent.getItemAtPosition(position);
+
+                Intent intent = new Intent(getContext() , DetailActivity.class);
+                intent.putExtra("card" , card);
+
+                startActivity(intent);
+            }
+        });
+
+        getLoaderManager().initLoader(0 , null , this);
 
         return view;
     }
 
-    private class RefreshDataTask extends AsyncTask<Void, Void, ArrayList<Card>> {
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return DataManager.getCursorLoader(getContext());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        adapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        adapter.swapCursor(null);
+    }
+
+    private class RefreshDataTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected ArrayList<Card> doInBackground(Void... voids) {
-            CardsAPI api = new CardsAPI();
+        protected Void doInBackground(Void... voids) {
+
             ArrayList<Card> result;
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -103,29 +126,21 @@ public class MainActivityFragment extends Fragment {
 
             //Depenent del color i raresa, fem una crida o un altra amb la API
             if (color.equalsIgnoreCase("None") && rarity.equalsIgnoreCase("None")) {
-                result = api.getAllCards();
+                result = CardsAPI.getAllCards();
             } else if (!color.equalsIgnoreCase("None") && !rarity.equalsIgnoreCase("None")) {
-                result = api.getCardsByRarityAndOrColor(color , rarity);
+                result = CardsAPI.getCardsByRarityAndOrColor(color , rarity);
             } else if (!color.equalsIgnoreCase("None")) {
-                result = api.getCardsByRarityAndOrColor(color , "None");
+                result = CardsAPI.getCardsByRarityAndOrColor(color , "None");
             } else {
-                result = api.getCardsByRarityAndOrColor("None" , rarity);
+                result = CardsAPI.getCardsByRarityAndOrColor("None" , rarity);
             }
 
-            return result;
+            DataManager.deleteCards(getContext());
+            DataManager.saveCards(result , getContext());
+
+            return null;
         }
 
-        @Override
-        protected void onPostExecute(ArrayList<Card> cards) {
-            adapter.clear();
-            if (!cards.isEmpty()) {
-                for (Card c : cards) {
-                    adapter.add(c);
-                }
-            } else {
-                Snackbar.make(getView() , "No hi ha cartes" , Snackbar.LENGTH_LONG).show();
-            }
-        }
     }
 }
 

@@ -1,23 +1,54 @@
 package com.example.carlos.magiccards;
 
-import android.app.Fragment;
+import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.example.carlos.magiccards.databinding.FragmentDetailBinding;
 
 /**
- * Created by 53639858v on 11/11/16.
+ * A placeholder fragment containing a simple view.
  */
-
 public class DetailActivityFragment extends Fragment {
 
-    public DetailActivityFragment(){}
+    private FragmentDetailBinding binding;
 
-    @Nullable
+    public DetailActivityFragment() {
+    }
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return super.onCreateView(inflater, container, savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = DataBindingUtil.inflate(inflater , R.layout.fragment_detail , container , false);
+        View view = binding.getRoot();
+
+        Intent i = getActivity().getIntent();
+
+        if (i != null) {
+            Card card = (Card) i.getSerializableExtra("card");
+
+            if (card != null) {
+                updateUi(card);
+            }
+        }
+
+        return view;
+    }
+
+    private void updateUi (Card card) {
+
+        Glide.with(getContext()).load(card.getImageUrl()).into(binding.ivCard);
+        binding.cardName.setText(card.getName());
+        binding.cardType.setText(card.getType());
+        binding.cardRarity.setText(card.getRarity());
+        binding.cardText.setText(card.getText());
+
     }
 }

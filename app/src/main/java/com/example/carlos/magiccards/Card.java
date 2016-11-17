@@ -28,6 +28,7 @@ public class Card implements Serializable{
     public void setColor(String[] color) {
         this.color = color;
     }
+
     public String getName() {
         return name;
     }

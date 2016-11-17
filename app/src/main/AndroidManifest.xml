@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.carlos.magiccards">
-    <!-- Para tener permisos de internet-->
+
+    <!-- Para tener permisos de internet -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -22,8 +23,7 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
-        </activity>
+            android:label="@string/title_activity_settings"></activity>
         <activity
             android:name=".DetailActivity"
             android:label="@string/title_activity_detail"
@@ -33,6 +33,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.carlos.magiccards.MainActivity" />
         </activity>
+
+        <provider
+            android:name=".CardsContentProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false" />
     </application>
 
 </manifest>

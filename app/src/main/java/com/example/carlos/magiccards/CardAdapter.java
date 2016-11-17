@@ -1,6 +1,8 @@
 package com.example.carlos.magiccards;
 
 import android.content.Context;
+import android.databinding.DataBindingComponent;
+import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +13,8 @@ import android.widget.TextView;
 
 import java.util.List;
 import com.bumptech.glide.Glide;
+import com.example.carlos.magiccards.databinding.LvCardsRowBinding;
 
-/**
- * Created by Carlos on 01/11/2016.
- */
 
 public class CardAdapter extends ArrayAdapter<Card> {
     public CardAdapter(Context context , int resource , List<Card> objects) {
@@ -24,21 +24,23 @@ public class CardAdapter extends ArrayAdapter<Card> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         Card card = getItem(position);
 
+        LvCardsRowBinding binding = null;
+
+        // Mirem a veure si la View s'està reusant, si no es així "inflem" la View
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
-            convertView = inflater.inflate(R.layout.lv_cards_row , parent , false);
+            binding = DataBindingUtil.inflate(inflater , R.layout.lv_cards_row , parent , false);
+        } else {
+            binding = DataBindingUtil.getBinding(convertView);
         }
 
-        TextView nameCard = (TextView) convertView.findViewById(R.id.nameCard);
-        TextView typeCard = (TextView) convertView.findViewById(R.id.typeCard);
-        ImageView cardImage = (ImageView) convertView.findViewById(R.id.cardImage);
+        binding.nameCard.setText(card.getName());
+        Glide.with(getContext()).load(card.getImageUrl()).into(binding.cardImage);
+        binding.typeCard.setText(card.getType());
 
-        nameCard.setText(card.getName());
-        typeCard.setText(card.getType());
-        Glide.with(getContext()).load(card.getImageUrl()).into(cardImage);
-
-        return convertView;
+        return binding.getRoot();
     }
 }

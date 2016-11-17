@@ -9,21 +9,18 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * Created by Carlos on 18/10/2016.
- */
 
 public class CardsAPI {
-    private final String BASE_URL = "http://api.magicthegathering.io/v1/cards";
+    private static final String BASE_URL = "http://api.magicthegathering.io/v1/cards";
 
-    ArrayList<Card> getAllCards() {
+    static ArrayList<Card> getAllCards() {
         Uri builtUri = Uri.parse(BASE_URL).buildUpon().build();
         String url = builtUri.toString();
         return doCall(url);
     }
 
     //Obtenir les cartes per raresa o per color
-    ArrayList<Card> getCardsByRarityAndOrColor (String color , String rarity) {
+    static ArrayList<Card> getCardsByRarityAndOrColor (String color , String rarity) {
 
         Uri builtUri;
 
@@ -50,8 +47,7 @@ public class CardsAPI {
     }
 
 
-
-    private ArrayList<Card> doCall(String url) {
+    private static ArrayList<Card> doCall(String url) {
 
         try {
             String JsonResponse = HttpUtils.get(url);
@@ -62,7 +58,7 @@ public class CardsAPI {
         return null;
     }
 
-    private ArrayList<Card> processJson(String jsonResponse) {
+    private static ArrayList<Card> processJson(String jsonResponse) {
 
         ArrayList<Card> cards = new ArrayList<>();
 
