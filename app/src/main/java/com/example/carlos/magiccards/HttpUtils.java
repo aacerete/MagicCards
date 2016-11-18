@@ -1,9 +1,5 @@
 package com.example.carlos.magiccards;
 
-/**
- * Created by Carlos on 18/10/2016.
- */
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;

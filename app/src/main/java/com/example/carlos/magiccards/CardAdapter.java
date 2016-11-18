@@ -1,15 +1,12 @@
 package com.example.carlos.magiccards;
 
 import android.content.Context;
-import android.databinding.DataBindingComponent;
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.List;
 import com.bumptech.glide.Glide;
@@ -27,7 +24,7 @@ public class CardAdapter extends ArrayAdapter<Card> {
 
         Card card = getItem(position);
 
-        LvCardsRowBinding binding = null;
+        LvCardsRowBinding binding;
 
         // Mirem a veure si la View s'està reusant, si no es així "inflem" la View
         if (convertView == null) {

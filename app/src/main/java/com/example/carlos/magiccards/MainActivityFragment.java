@@ -13,8 +13,6 @@ import android.support.v4.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.database.Cursor;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.MenuItem;
 import android.view.View;

@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
@@ -20,10 +19,6 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 
 import java.util.List;
-
-/**
- * Created by Carlos on 31/10/2016.
- */
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -97,15 +92,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
-    /*@Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-
-        }
-        return super.onMenuItemSelected(featureId, item);
-    }*/
 
     @Override
     public boolean onIsMultiPane() {

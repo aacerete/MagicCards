@@ -81,10 +81,14 @@ public class CardsAPI {
                     card.setRarity("");
                 }
                 if (object.has("colors")) {
-                    String[] colors = new String[object.getJSONArray("colors").length()];
+                    String colors = "";
 
-                    for (int j = 0 ; j < colors.length ; j++) {
-                        colors[j] = object.getJSONArray("colors").get(j).toString();
+                    for (int j = 0 ; j < object.getJSONArray("colors").length() ; j++) {
+                        if (j != object.getJSONArray("colors").length() - 1) {
+                            colors += object.getJSONArray("colors").get(j).toString() + ", ";
+                        } else {
+                            colors += object.getJSONArray("colors").get(j).toString();
+                        }
                     }
 
                     card.setColor(colors);

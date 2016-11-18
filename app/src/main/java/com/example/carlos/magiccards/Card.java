@@ -7,7 +7,7 @@ public class Card implements Serializable{
     private String id;
     private String name;
     private String rarity;
-    private String[] color;
+    private String color;
     private String text;
     private String type;
     private String imageUrl;
@@ -21,11 +21,11 @@ public class Card implements Serializable{
         this.id = id;
     }
 
-    public String[] getColor() {
+    public String getColor() {
         return color;
     }
 
-    public void setColor(String[] color) {
+    public void setColor(String color) {
         this.color = color;
     }
 
