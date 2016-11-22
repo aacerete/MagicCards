@@ -1,5 +1,6 @@
 package com.example.carlos.magiccards;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.alexvasilkov.events.Events;
 import com.example.carlos.magiccards.databinding.FragmentMainBinding;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private CardsCursorAdapter adapter;
+    private ProgressDialog dialog;
 
     public MainActivityFragment() {
     }
@@ -79,22 +82,36 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         adapter = new CardsCursorAdapter(getContext() , Card.class);
 
+        dialog = new ProgressDialog(getContext());
+        dialog.setMessage("Loading...");
+
         binding.lvCard.setAdapter(adapter);
         binding.lvCard.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Card card = (Card) parent.getItemAtPosition(position);
 
-                Intent intent = new Intent(getContext() , DetailActivity.class);
-                intent.putExtra("card" , card);
+                if (!esTablet()) {
 
-                startActivity(intent);
+                    Intent intent = new Intent(getContext() , DetailActivity.class);
+                    intent.putExtra("card" , card);
+
+                    startActivity(intent);
+
+                } else {
+                    Events.create("card-selected").param(card).post();
+                }
+
             }
         });
 
         getLoaderManager().initLoader(0 , null , this);
 
         return view;
+    }
+
+    private boolean esTablet() {
+        return getResources().getBoolean(R.bool.tablet);
     }
 
     @Override
@@ -113,6 +130,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     private class RefreshDataTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
 
@@ -139,6 +162,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             return null;
         }
 
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            dialog.dismiss();
+        }
     }
 }
 
